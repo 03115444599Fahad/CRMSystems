@@ -106,5 +106,45 @@ namespace VisaApplicationSystem.Controllers
 
 
         }
+        [HttpGet]
+        public IActionResult Login()
+        {
+
+            return View();
+
+        }
+        [HttpPost]
+        public IActionResult Login( string email,string password)
+        {
+            try
+            {
+
+                var user = _dbContext.User.FirstOrDefault(x => x.Email == email && password== password);
+                if (user == null)
+                {
+                    return RedirectToAction("Login");
+                }
+                HttpContext.Session.SetString("ID", user.ID.ToString());
+                HttpContext.Session.SetString("email", user.Email.ToString());
+                if (user.IsAdmin)
+                {
+                    HttpContext.Session.SetString("IsAdmin", "true");
+                }
+                else
+                {
+
+                    HttpContext.Session.SetString("IsAdmin", "false");
+                }
+                return RedirectToAction("Index");
+            }
+            catch (Exception ex)
+            {
+
+                return Json(new { result = false, message = ex.Message });
+            }
+
+
+
+        }
     }
 }

@@ -148,7 +148,11 @@ namespace VisaApplicationSystem.Controllers
         {
             try
             {
-
+                var isAdmin=HttpContext.Session.GetString("IsAdmin");
+                if (isAdmin!= "true")
+                {
+                    return Json(new { result = false, message = "Only Admin can Delete" });
+                }
                 var VisaApplication = _dbContext.VisaApplications.FirstOrDefault(x => x.ID == ID);
                 _dbContext.Entry(VisaApplication).State = EntityState.Deleted;
                 var result = _dbContext.SaveChanges();

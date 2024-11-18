@@ -11,6 +11,7 @@ namespace VisaApplicationSystem.Services
         {
             var services = builder.Services;
             services.AddDbContext<ApplicationDBContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("VisaApplicationSystem")));
+            
             services.AddControllersWithViews();
             services.AddControllers().AddJsonOptions(options =>
             {
