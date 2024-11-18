@@ -1,0 +1,277 @@
+﻿@model List<VisaApplicationSystem.Models.User>
+<table class="table">
+</table>
+<link href="~/panelcontent/css/adminlte.min.css" rel="stylesheet" />
+
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+
+                        <h3 class="card-title"><b>Users</b></h3>
+
+                    </div>
+
+                    <div class="card-body">
+                        <button type="button" class="btn btn-info btn-sm" onclick="OpenAddModel()">Create New</button>
+                        <br />
+
+
+                        <br />
+                        <table class="table table-bordered table-hover">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        First Name
+                                    </th>
+                                    <th>
+                                        Last Name
+                                    </th>
+                                    <th>
+                                        Email
+                                    </th>
+                                    <th>
+                                        Entry Date
+                                    </th>
+                                    <th>
+                                        Actions
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @{
+
+                                    foreach (var user in Model)
+                                    {
+                                        <tr>
+                                            <td>
+                                                @user.FirstName
+                                            </td>
+                                            <td>
+                                                @user.LastName
+                                            </td>
+                                            <td>
+                                                @user.Email
+                                            </td>
+                                            <td>
+                                                @user.EntryDate
+                                            </td>
+                                            <td>
+                                                @{
+                                                    if (user.IsAdmin)
+                                                    {
+                                                        <button type="button" class="btn btn-info btn-sm" onclick="OpenUpdateModel('@user.ID','@user.FirstName','@user.LastName','@user.Email','@user.Password')" >Update</button>
+                                                        <button type="button" class="btn btn-danger btn-sm" onclick="DeleteUser(@user.ID)" >Delete</button>
+
+                                                    }
+                                                    else
+                                                    {
+                                                        <button type="button" class="btn btn-info btn-sm" onclick="OpenUpdateModel('@user.ID','@user.FirstName','@user.LastName','@user.Email','@user.Password')" disabled>Update</button>
+                                                        <button type="button" class="btn btn-danger btn-sm" onclick="DeleteUser(@user.ID)" disabled>Delete</button>
+
+                                                    }
+                                                }
+                                                </td>
+                                        </tr>
+
+                                    }
+                                }
+                            </tbody>
+                        </table>
+
+                    </div>
+                    <!-- /.card-body -->
+                </div>
+                <!-- /.card -->
+                <!-- /.card -->
+            </div>
+            <!-- /.col -->
+        </div>
+        <!-- /.row -->
+    </div>
+    <!-- /.container-fluid -->
+</section>
+
+<!-- Modal -->
+<div id="AddModal" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-lg">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+
+                <h4 class="modal-title" id="UserModel">Add User</h4>
+            </div>
+            <div class="modal-body">
+                <form id="AddForm">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <input type="text" hidden name="ID" id="ID">
+                                <label for="PackageName" class="col-form-label">First Name </label>
+                                <input type="text" required name="FirstName" class="form-control" id="FirstName">
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+
+                                <label for="PackageName" class="col-form-label">Last Name </label>
+                                <input type="text" required name="LastName" class="form-control" id="LastName">
+                            </div>
+                        </div>
+
+                    </div>   <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+
+                                <label for="Email" class="col-form-label">Email </label>
+                                <input type="text" required name="Email" class="form-control" id="Email">
+                            </div>
+                        </div>
+
+                    </div>   <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+
+                                <label for="Password" class="col-form-label">Password </label>
+                                <input type="password" required name="Password" class="form-control" id="Password">
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-group">
+
+                                <label for="ReenterPassword" class="col-form-label">Password Reenter</label>
+                                <input type="password" required name="ReenterPassword" class="form-control" id="ReenterPassword">
+                            </div>
+                        </div>
+                    </div>
+
+                    <p id="AddError" style="color: red;margin-left: 7px;"> </p>
+
+                    <div class="modal-footer" >
+                        <button type="submit" class="btn btn-info" id="UserModelbtnSave">Save</button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+
+<script type="text/javascript">
+
+    $("#AddForm").on("submit", function (event) {
+        event.preventDefault();
+        var Url = "/User/Add";
+        if ($("#UserModelbtnSave").html() == "Update") {
+            Url = "/User/Update";
+        }
+        var data = getFormObj("AddForm");
+        if (data.ReenterPassword != data.Password) {
+            $("#AddError").html("Password missmatch");
+            return;
+        }
+        $.ajax({
+            method: "POST",
+            url: Url,
+            data: data
+        }).done(function (result) {
+            if (result.result) {
+
+                location.reload()
+            }
+            else {
+                Swal.fire({
+                    icon: "error",
+                    title: "Oops...",
+                    text: result.message
+                });
+
+
+            }
+
+        });
+    });
+
+
+
+    function DeleteUser(ID) {
+        var Url = "/User/Delete";
+
+        Swal.fire({
+            title: "are you sure to delete users",
+            showDenyButton: true,
+            confirmButtonText: "Yes",
+            denyButtonText: `Don't delete`
+        }).then((result) => {
+            /* Read more about isConfirmed, isDenied below */
+            if (result.isConfirmed) {
+               
+                $.ajax({
+                    method: "POST",
+                    url: Url,
+                    data: { ID: ID }
+                }).done(function (result) {
+                    if (result.result) {
+
+                        location.reload()
+                    }
+                    else {
+                        Swal.fire({
+                            icon: "error",
+                            title: "Oops...",
+                            text: result.message
+                        });
+
+                    }
+
+                });
+            } else if (result.isDenied) {
+                return;
+            }
+        });
+
+        
+    }
+    function OpenAddModel() {
+        $("#AddModal").modal();
+        $("#UserModel").html("Add User");
+        $("#UserModelbtnSave").html("Save");
+
+
+    }
+    function OpenUpdateModel(ID, FirstName, LastName, Email, Password) {
+        $("#ID").val(ID);
+        $("#FirstName").val(FirstName);
+        $("#LastName").val(LastName);
+        $("#Email").val(Email);
+        $("#Password").val(Password);
+        $("#AddModal").modal();
+
+        $("#UserModel").text("Update User");
+        $("#UserModelbtnSave").html("Update");
+    }
+    function getFormObj(formId) {
+        var formElements = document.getElementById(formId).elements;
+        var postData = {};
+        for (var i = 0; i < formElements.length; i++) {
+            if (formElements[i].type != "submit")//we dont want to include the submit-buttom
+                postData[formElements[i].name] = formElements[i].value;
+            if (formElements[i].type == "checkbox") {
+                postData[formElements[i].name] = formElements[i].checked;
+            }
+
+
+
+        }
+        return postData;
+    }
+</script>

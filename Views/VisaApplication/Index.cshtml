@@ -1,0 +1,271 @@
+﻿@model List<VisaApplicationSystem.Models.VisaApplication>
+<table class="table">
+</table>
+<link href="~/panelcontent/css/adminlte.min.css" rel="stylesheet" />
+
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+
+                        <h3 class="card-title"><b>VisaApplications</b></h3>
+
+                    </div>
+
+                    <div class="card-body">
+                        <button type="button" class="btn btn-info btn-sm" onclick="OpenAddModel()">Create New</button>
+                        <br />
+
+
+                        <br />
+                        <table class="table table-bordered table-hover">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        User Name
+                                    </th>
+                                    <th>
+                                        Passport Copy
+                                    </th>
+                                    <th>
+                                        Visa Type
+                                    </th>
+                                    <th>
+                                        Country
+                                    </th>
+                                    <th>
+                                        Application Status
+                                    </th>
+                                    <th>
+                                        Actions
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @{
+
+                                    foreach (var VisaApplication in Model)
+                                    {
+                                            <tr>
+                                                <td>
+                                                    @VisaApplication.UserName
+                                                </td>
+                                                <td>
+                                                <img src="@VisaApplication.PassPortCopy" style="height: 100px;width: 100px;" />
+                                                </td>
+                                                <td>
+                                                    @VisaApplication.VisaType
+                                                </td>
+                                                <td>
+                                                    @VisaApplication.Country
+                                                </td>
+                                                <td>
+                                                    @VisaApplication.Status
+                                                </td>
+                                                <td>
+                                                    <button type="button" class="btn btn-info btn-sm" onclick="OpenUpdateModel('@VisaApplication.ID','@VisaApplication.UserName','@VisaApplication.PassPortCopy','@VisaApplication.VisaType','@VisaApplication.Country')">Update</button>
+                                                    <button type="button" class="btn btn-danger btn-sm" onclick="DeleteVisaApplication(@VisaApplication.ID)">Delete</button>
+                                                </td>
+                                            </tr>
+
+                                    }
+                                }
+                            </tbody>
+                        </table>
+
+                    </div>
+                    <!-- /.card-body -->
+                </div>
+                <!-- /.card -->
+                <!-- /.card -->
+            </div>
+            <!-- /.col -->
+        </div>
+        <!-- /.row -->
+    </div>
+    <!-- /.container-fluid -->
+</section>
+
+<!-- Modal -->
+<div id="AddModal" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-lg">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+
+                <h4 class="modal-title" id="VisaApplicationModel">Add VisaApplication</h4>
+            </div>
+            <div class="modal-body">
+                <form id="AddForm">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <input type="hidden" name="ID" id="ID">
+                                <label for="UserName" class="col-form-label">User Name</label>
+                                <input type="text" required name="UserName" class="form-control" id="UserName">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label for="VisaType" class="col-form-label">Visa Type</label>
+                                <select name="VisaType" id="VisaType" class="form-control" required>
+                                    <option value="" selected>Select Visa Type</option>
+                                    <option value="Visit Visa">Visit Visa</option>
+                                    <option value="Work Visa">Work Visa</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label for="Country" class="col-form-label">Country</label>
+                                <select name="Country" id="Country" class="form-control" required>
+                                    <option value="" selected>Select Country</option>
+                                    <option value="UK">UK</option>
+                                    <option value="USA">USA</option>
+                                    <option value="KSA">KSA</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label for="PassPortCopy" class="col-form-label">Passport Copy</label>
+                                <input type="file" required name="PassPortCopy" class="form-control" id="PassPortCopy" accept=".jpeg,.jpg">
+                            </div>
+                        </div>
+                    </div>
+
+                    <p id="AddError" style="color: red; margin-left: 7px;"></p>
+
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-info" id="VisaApplicationModelbtnSave">Save</button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+
+<script type="text/javascript">
+
+    $("#AddForm").on("submit", function (event) {
+        event.preventDefault();
+        var Url = "/VisaApplication/Add";
+        if ($("#VisaApplicationModelbtnSave").html() == "Update") {
+            Url = "/VisaApplication/Update";
+        }
+        var formData = new FormData(this);
+       
+        $.ajax({
+            type: "POST",
+            data: formData,
+            processData: false, // Required for FormData
+            contentType: false, // Required for FormData
+            url: Url,
+        }).done(function (result) {
+            if (result.result) {
+
+                location.reload()
+            }
+            else {
+                Swal.fire({
+                    icon: "error",
+                    title: "Oops...",
+                    text: result.message
+                });
+
+
+            }
+
+        });
+    });
+
+
+
+    function DeleteVisaApplication(ID) {
+
+        Swal.fire({
+            title: "are you sure to delete VisaApplication",
+            showDenyButton: true,
+            confirmButtonText: "Yes",
+            denyButtonText: `Don't delete`
+        }).then((result) => {
+            /* Read more about isConfirmed, isDenied below */
+            if (result.isConfirmed) {
+                var Url = "/VisaApplication/Delete";
+
+                $.ajax({
+                    method: "POST",
+                    url: Url,
+                    data: { ID: ID }
+                }).done(function (result) {
+                    if (result.result) {
+
+                        location.reload()
+                    }
+                    else {
+                        Swal.fire({
+                            icon: "error",
+                            title: "Oops...",
+                            text: result.message
+                        });
+
+                    }
+
+                });
+            } else if (result.isDenied) {
+                return; 
+            }
+        });
+
+    }
+    function OpenAddModel() {
+        $("#AddModal").modal();
+        $("#VisaApplicationModel").html("Add VisaApplication");
+        $("#VisaApplicationModelbtnSave").html("Save");
+
+
+    }
+    function OpenUpdateModel(ID, FirstName, LastName, Email, Phone) {
+        $("#ID").val(ID);
+        $("#FirstName").val(FirstName);
+        $("#LastName").val(LastName);
+        $("#Email").val(Email);
+        $("#Phone").val(Phone);
+        $("#AddModal").modal();
+
+        $("#VisaApplicationModel").text("Update VisaApplication");
+        $("#VisaApplicationModelbtnSave").html("Update");
+    }
+    function getFormObj(formId) {
+        var formElements = document.getElementById(formId).elements;
+        var postData = {};
+        for (var i = 0; i < formElements.length; i++) {
+            if (formElements[i].type != "submit")//we dont want to include the submit-buttom
+                postData[formElements[i].name] = formElements[i].value;
+            if (formElements[i].type == "checkbox") {
+                postData[formElements[i].name] = formElements[i].checked;
+            }
+
+
+
+        }
+        return postData;
+    }
+</script>
